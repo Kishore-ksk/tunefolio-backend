@@ -1,0 +1,21 @@
+# Ignore all files in the public folder
+/public/*
+
+# But don't ignore the public folder itself
+!public/
+!storage/
+# Don't ignore the important files inside public (e.g., CSS, JS, etc.)
+!public/*.css
+!public/*.js
+
+# Don't ignore the storage link
+!public/storage/
+
+# Allow some specific directories, like albums and songs images
+!public/albums/
+!public/songs/
+!public/images/
+
+# Don't ignore the .gitignore file itself
+!.gitignore
+
