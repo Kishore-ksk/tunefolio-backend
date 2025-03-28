@@ -10,7 +10,9 @@ use App\Http\Controllers\SongController;
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login']);
 
-
+Route::get('/debug', function () {
+    return response()->json(['error' => file_get_contents(storage_path('logs/laravel.log'))]);
+});
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -18,9 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/api/logout', [AuthController::class, 'logout']);
     Route::delete('/api/auth/delete', [AuthController::class, 'deleteAccount']);
 
-    Route::get('/debug', function () {
-        return response()->json(['error' => file_get_contents(storage_path('logs/laravel.log'))]);
-    });
 
 
     // ✅ Album Routes
