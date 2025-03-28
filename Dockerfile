@@ -42,8 +42,5 @@ RUN php artisan config:cache
 # Expose the port Laravel will run on
 EXPOSE 8000
 
-RUN php artisan migrate --force
-
-
 # Start Laravel Server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
