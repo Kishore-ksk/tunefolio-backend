@@ -1,5 +1,6 @@
-# Use PHP 8.1 with FPM
-FROM php:8.1-fpm
+# Use PHP 8.2 with FPM
+FROM php:8.2-fpm
+
 
 # Set the working directory inside the container
 WORKDIR /var/www/html
