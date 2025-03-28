@@ -10,6 +10,11 @@ use App\Http\Controllers\SongController;
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login']);
 
+Route::get('/debug', function () {
+    return response()->json(['error' => file_get_contents(storage_path('logs/laravel.log'))]);
+});
+
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/user', [AuthController::class, 'user']);
     Route::post('/api/logout', [AuthController::class, 'logout']);
