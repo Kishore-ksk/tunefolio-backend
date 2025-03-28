@@ -25,9 +25,16 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-
-# Set correct permissions for storage and cache
+# Set environment and permissions
 RUN chmod -R 775 storage bootstrap/cache
+
+# Ensure APP_KEY exists before running Artisan commands
+RUN php artisan key:generate || true
+
+# Run Artisan commands (ignore failures)
+RUN php artisan config:clear || true && \
+    php artisan cache:clear || true && \
+    php artisan config:cache || true
 
 # Set Laravel environment (Render will handle .env separately)
 RUN php artisan config:cache
