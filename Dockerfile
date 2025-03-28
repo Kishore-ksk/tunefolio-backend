@@ -24,11 +24,14 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Give storage permission
-RUN chmod -R 777 storage bootstrap/cache
+# Set correct permissions for storage and cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Expose the port for Laravel
+# Set Laravel environment (Render will handle .env separately)
+RUN php artisan config:cache
+
+# Expose the port Laravel will run on
 EXPOSE 8000
 
-# Start Laravel and cache config
-CMD ["sh", "-c", "cp .env.example .env && php artisan config:cache && php artisan serve --host=0.0.0.0 --port=8000"]
+# Start Laravel Server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
