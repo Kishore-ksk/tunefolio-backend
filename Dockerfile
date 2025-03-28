@@ -25,8 +25,6 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Clear and cache config
-RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
 
 # Set correct permissions for storage and cache
 RUN chmod -R 775 storage bootstrap/cache
