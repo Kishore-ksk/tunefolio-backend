@@ -11,19 +11,17 @@ use Illuminate\Http\JsonResponse;
 Route::post('/api/register', [AuthController::class, 'register']);
 Route::post('/api/login', [AuthController::class, 'login']);
 
+Route::get('/api/status', function (): JsonResponse {
+    return response()->json([
+        'status' => 'OK',
+        'message' => 'API is running'
+    ]);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/user', [AuthController::class, 'user']);
     Route::post('/api/logout', [AuthController::class, 'logout']);
     Route::delete('/api/auth/delete', [AuthController::class, 'deleteAccount']);
-
-    Route::get('/status', function (): JsonResponse {
-        return response()->json([
-            'status' => 'OK',
-            'message' => 'API is running'
-        ]);
-    });
-
 
 
     // ✅ Album Routes
