@@ -5,10 +5,21 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\SongController;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 
 // ✅ Auth Routes
-Route::post('/api/register', [AuthController::class, 'register']);
+Route::post('/api/register', function (Request $request) {
+    try {
+        $controller = app()->make(App\Http\Controllers\AuthController::class);
+        return $controller->register($request);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTrace()
+        ], 500);
+    }
+});
 Route::post('/api/login', [AuthController::class, 'login']);
 
 Route::get('/api/status', function (): JsonResponse {
