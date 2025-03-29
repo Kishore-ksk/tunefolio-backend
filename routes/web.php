@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\SongController;
+use Illuminate\Http\JsonResponse;
 
 
 // ✅ Auth Routes
@@ -15,6 +16,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/user', [AuthController::class, 'user']);
     Route::post('/api/logout', [AuthController::class, 'logout']);
     Route::delete('/api/auth/delete', [AuthController::class, 'deleteAccount']);
+
+    Route::get('/status', function (): JsonResponse {
+        return response()->json([
+            'status' => 'OK',
+            'message' => 'API is running'
+        ]);
+    });
 
 
 
