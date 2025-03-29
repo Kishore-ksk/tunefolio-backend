@@ -30,7 +30,12 @@ Route::get('/api/status', function (): JsonResponse {
 });
 
 Route::get('/debug', function () {
-    return response()->json(['error' => file_get_contents(storage_path('logs/laravel.log'))]);
+    return response()->json([
+        'env_exists' => file_exists(base_path('.env')) ? 'Yes' : 'No',
+        'app_env' => env('APP_ENV'),
+        'db_connection' => env('DB_CONNECTION'),
+        'error_log' => file_get_contents(storage_path('logs/laravel.log'))
+    ]);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
