@@ -1,11 +1,10 @@
-# Use PHP 8.2 with FPM
+# ✅ Use PHP 8.2 with FPM
 FROM php:8.2-fpm
 
-
-# Set the working directory inside the container
+# ✅ Set the working directory
 WORKDIR /var/www/html
 
-# Install necessary PHP extensions
+# ✅ Install required system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
   libpng-dev \
   libjpeg-dev \
@@ -16,31 +15,30 @@ RUN apt-get update && apt-get install -y \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install gd pdo pdo_mysql
 
-# Install Composer
+# ✅ Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy Laravel app files
+# ✅ Copy Laravel application files
 COPY . .
 
-# Install PHP dependencies
+# ✅ Install PHP dependencies (optimized for production)
 RUN composer install --no-dev --optimize-autoloader
 
-# Set environment and permissions
+# ✅ Set folder permissions
 RUN chmod -R 775 storage bootstrap/cache
 
-# Ensure APP_KEY exists before running Artisan commands
+# ✅ Generate APP_KEY (will silently skip if already set)
 RUN php artisan key:generate || true
 
-# Run Artisan commands (ignore failures)
+# ✅ Clear and cache config, routes, and application cache
 RUN php artisan config:clear || true && \
     php artisan cache:clear || true && \
-    php artisan config:cache || true
+    php artisan route:clear || true && \
+    php artisan config:cache && \
+    php artisan route:cache
 
-# Set Laravel environment (Render will handle .env separately)
-RUN php artisan config:cache
-
-# Expose the port Laravel will run on
+# ✅ Expose port Laravel runs on
 EXPOSE 8000
 
-# Start Laravel Server
+# ✅ Start Laravel server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
