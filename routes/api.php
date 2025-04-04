@@ -15,13 +15,16 @@ Route::get('/status', function (): JsonResponse {
   ]);
 });
 
-// ✅ Debug route (optional: remove in production)
+// ✅ Better way to debug
 Route::get('/debug', function () {
   return response()->json([
-    'env_exists' => file_exists(base_path('.env')) ? 'Yes' : 'No',
     'app_env' => env('APP_ENV'),
-    'db_connection' => env('DB_CONNECTION'),
-    'error_log' => file_get_contents(storage_path('logs/laravel.log'))
+    'app_key_set' => env('APP_KEY') ? 'Yes' : 'No',
+    'db_host' => env('DB_HOST'),
+    'db_username' => env('DB_USERNAME'),
+    'db_database' => env('DB_DATABASE'),
+    'debug_mode' => env('APP_DEBUG'),
+    'sanctum_domains' => env('SANCTUM_STATEFUL_DOMAINS'),
   ]);
 });
 
