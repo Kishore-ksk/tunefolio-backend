@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AuthController extends Controller
 {
@@ -21,14 +22,15 @@ class AuthController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
 
-        // Handle image upload
-        $imagePath = $request->file('image')->store('images', 'public');
+        // Upload image to Cloudinary
+        $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'image' => $imagePath, // Save image path in DB
+            'image' => $uploadedFileUrl, // Save image path in DB
         ]);
         // Generate a token
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -37,7 +39,7 @@ class AuthController extends Controller
             'message' => 'User registered successfully!',
             'user' => $user,
             'token' => $token,
-            'image' => url('storage/' . $user->image) // ✅ Prepend URL here
+            'image' => $uploadedFileUrl
         ], 201);
     }
 
