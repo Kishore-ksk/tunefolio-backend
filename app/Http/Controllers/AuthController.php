@@ -16,10 +16,8 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->cloudinary = new Cloudinary([
-            'cloud' => config('cloudinary.cloud'),
-            'url' => config('cloudinary.url'),
-        ]);
+        // ✅ Use single CLOUDINARY_URL from config/cloudinary.php
+        $this->cloudinary = new Cloudinary(config('cloudinary.cloudinary_url'));
     }
 
     // ✅ Register a new user
@@ -32,6 +30,7 @@ class AuthController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // 🔼 Upload profile image to Cloudinary
         $uploaded = $this->cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
         $imageUrl = $uploaded['secure_url'];
 
@@ -68,6 +67,7 @@ class AuthController extends Controller
             ]);
         }
 
+        // Remove previous tokens for clean login
         $user->tokens()->delete();
         $token = $user->createToken('authToken')->plainTextToken;
 

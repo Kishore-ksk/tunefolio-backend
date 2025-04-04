@@ -15,10 +15,8 @@ class SongController extends Controller
 
     public function __construct()
     {
-        $this->cloudinary = new Cloudinary([
-            'cloud' => config('cloudinary.cloud'),
-            'url' => config('cloudinary.url'),
-        ]);
+        // ✅ Use single CLOUDINARY_URL instead of array config
+        $this->cloudinary = new Cloudinary(config('cloudinary.cloudinary_url'));
     }
 
     // ✅ Store a new song
@@ -138,6 +136,7 @@ class SongController extends Controller
 
             return response()->json(['message' => 'Song updated successfully!', 'song' => $song], 200);
         } catch (\Exception $e) {
+            Log::error('Song update failed: ' . $e->getMessage());
             return response()->json(['error' => 'Song not found or update failed!'], 404);
         }
     }

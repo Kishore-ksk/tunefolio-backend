@@ -15,10 +15,8 @@ class AlbumController extends Controller
 
     public function __construct()
     {
-        $this->cloudinary = new Cloudinary([
-            'cloud' => config('cloudinary.cloud'),
-            'url' => config('cloudinary.url'),
-        ]);
+        // ✅ Use single CLOUDINARY_URL instead of array config
+        $this->cloudinary = new Cloudinary(config('cloudinary.cloudinary_url'));
     }
 
     // 🟢 CREATE ALBUM
@@ -41,7 +39,7 @@ class AlbumController extends Controller
             return response()->json(['error' => 'Unauthorized. Please log in.'], 401);
         }
 
-        // Upload to Cloudinary
+        // ✅ Upload image to Cloudinary
         $uploaded = $this->cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
         $imageUrl = $uploaded['secure_url'];
 
