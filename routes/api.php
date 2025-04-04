@@ -15,7 +15,6 @@ Route::get('/status', function (): JsonResponse {
   ]);
 });
 
-// ✅ Better way to debug
 Route::get('/debug', function () {
   return response()->json([
     'app_env' => env('APP_ENV'),
@@ -23,8 +22,18 @@ Route::get('/debug', function () {
     'db_host' => env('DB_HOST'),
     'db_username' => env('DB_USERNAME'),
     'db_database' => env('DB_DATABASE'),
-    'debug_mode' => env('APP_DEBUG'),
+    'debug_mode' => (bool) env('APP_DEBUG'),
     'sanctum_domains' => env('SANCTUM_STATEFUL_DOMAINS'),
+    'storage_linked' => file_exists(public_path('storage')) ? 'Yes' : 'No',
+    'can_connect_db' => function_exists('mysqli_connect')
+      ? (mysqli_connect(env('DB_HOST'), env('DB_USERNAME'), env('DB_PASSWORD'), env('DB_DATABASE')) ? 'Yes' : 'No')
+      : 'mysqli not available',
+    'recent_errors' => file_exists(storage_path('logs/laravel.log'))
+      ? collect(explode("\n", file_get_contents(storage_path('logs/laravel.log'))))
+        ->filter(fn($line) => str_contains($line, 'ERROR'))
+        ->take(-5)
+        ->values()
+      : 'Log file not found',
   ]);
 });
 
