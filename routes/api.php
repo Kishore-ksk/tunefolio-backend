@@ -36,6 +36,15 @@ Route::get('/debug', function () {
       : 'Log file not found',
   ]);
 });
+Route::get('/test-mysql', function () {
+  try {
+    \DB::statement('SELECT 1');
+    return '✅ Laravel connected to MySQL';
+  } catch (\Exception $e) {
+    return '❌ ' . $e->getMessage();
+  }
+});
+
 
 // ✅ Public Auth routes
 Route::post('/register', [AuthController::class, 'register']);
