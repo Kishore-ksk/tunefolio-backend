@@ -102,14 +102,27 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if (!$user) {
+            Log::warning('Delete account failed: No authenticated user.');
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $user->tokens()->delete();
-        $user->delete();
+        try {
+            // Delete all tokens if any
+            if (method_exists($user, 'tokens')) {
+                $user->tokens()->delete();
+            }
 
-        Log::info('User deleted successfully.');
+            $user->delete();
 
-        return response()->json(['message' => 'Account deleted successfully'], 200);
+            Log::info('User deleted successfully.', ['user_id' => $user->id]);
+
+            return response()->json(['message' => 'Account deleted successfully'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error while deleting user account: ' . $e->getMessage(), [
+                'user_id' => $user->id ?? null,
+            ]);
+
+            return response()->json(['message' => 'Something went wrong while deleting account.'], 500);
+        }
     }
 }
