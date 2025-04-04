@@ -8,42 +8,51 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary;
 
 class AuthController extends Controller
 {
-    // Register a new user
+    protected $cloudinary;
+
+    public function __construct()
+    {
+        $this->cloudinary = new Cloudinary([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+        ]);
+    }
+
+    // ✅ Register a new user
     public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Upload image to Cloudinary
-        $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-
+        $uploaded = $this->cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
+        $imageUrl = $uploaded['secure_url'];
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'image' => $uploadedFileUrl, // Save image path in DB
+            'image' => $imageUrl,
         ]);
-        // Generate a token
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'User registered successfully!',
             'user' => $user,
             'token' => $token,
-            'image' => $uploadedFileUrl
+            'image' => $imageUrl
         ], 201);
     }
 
-    // Login
+    // ✅ Login
     public function login(Request $request)
     {
         $request->validate([
@@ -59,27 +68,23 @@ class AuthController extends Controller
             ]);
         }
 
-        // Revoke old tokens before creating a new one
         $user->tokens()->delete();
-
-        // Generate new token
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful!',
             'token' => $token,
-            'user' => $user, // Optional: Send user data if needed
+            'user' => $user,
         ], 200);
     }
 
-    // Get logged-in user
+    // ✅ Get logged-in user
     public function user(Request $request)
     {
         return response()->json($request->user());
-
     }
 
-    // Logout
+    // ✅ Logout
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -89,23 +94,22 @@ class AuthController extends Controller
         ]);
     }
 
+    // ✅ Delete account
     public function deleteAccount(Request $request)
     {
-
         Log::info('Delete account request received.', ['user' => Auth::user()]);
 
-        $user = Auth::user(); // Get the logged-in user
+        $user = Auth::user();
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        // Delete user from the database
-        $user->tokens()->delete(); // Revoke all tokens
+        $user->tokens()->delete();
         $user->delete();
+
         Log::info('User deleted successfully.');
 
         return response()->json(['message' => 'Account deleted successfully'], 200);
     }
-
 }

@@ -6,10 +6,21 @@ use App\Models\Album;
 use App\Models\Song;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Log;
+use Cloudinary\Cloudinary;
 
 class SongController extends Controller
 {
+    protected $cloudinary;
+
+    public function __construct()
+    {
+        $this->cloudinary = new Cloudinary([
+            'cloud' => config('cloudinary.cloud'),
+            'url' => config('cloudinary.url'),
+        ]);
+    }
+
     // ✅ Store a new song
     public function store(Request $request)
     {
@@ -32,7 +43,8 @@ class SongController extends Controller
         }
 
         // 🔼 Upload to Cloudinary
-        $imageUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
+        $uploaded = $this->cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
+        $imageUrl = $uploaded['secure_url'];
 
         $song = Song::create([
             'name' => $request->name,
@@ -118,8 +130,8 @@ class SongController extends Controller
             }
 
             if ($request->hasFile('image')) {
-                $imageUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-                $song->image = $imageUrl;
+                $uploaded = $this->cloudinary->uploadApi()->upload($request->file('image')->getRealPath());
+                $song->image = $uploaded['secure_url'];
             }
 
             $song->save();
