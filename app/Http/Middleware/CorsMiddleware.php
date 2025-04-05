@@ -10,7 +10,7 @@ class CorsMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $allowedOrigins = ['*']; // ✅ Allow only your frontend
+        $allowedOrigins = ['https://tunefolio-frontend.vercel.app', 'http://localhost:5176']; // ✅ Allow only your frontend
 
         $origin = $request->headers->get('Origin');
 
