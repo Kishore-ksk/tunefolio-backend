@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\SongController;
+use App\Http\Controllers\UserController;
 
 // ✅ Status check
 Route::get('/status', function (): JsonResponse {
@@ -50,6 +51,7 @@ Route::get('/test-mysql', function () {
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/users', [UserController::class, 'index']);
 
 // ✅ Protected routes
 Route::middleware('auth:sanctum')->group(function () {

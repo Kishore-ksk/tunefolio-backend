@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\SongController;
+use App\Http\Controllers\UserController;
 
 // 🌐 Default welcome route
 Route::get('/', function () {
@@ -19,6 +20,7 @@ Route::get('/sanctum/csrf-cookie', function () {
 // 🔓 Public Auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/users', [UserController::class, 'index']);
 
 // 🔒 Protected routes (Sanctum Auth)
 Route::middleware('auth:sanctum')->group(function () {
